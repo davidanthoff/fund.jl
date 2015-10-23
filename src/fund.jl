@@ -182,6 +182,7 @@ function constructfund(;nsteps=1050)
     connectparameter(m, :impactdeathmorbidity, :hurrdead, :impacttropicalstorms, :hurrdead)
     connectparameter(m, :impactdeathmorbidity, :extratropicalstormsdead, :impactextratropicalstorms, :extratropicalstormsdead)
     connectparameter(m, :impactdeathmorbidity, :diasick, :impactdiarrhoea, :diasick)
+    connectparameter(m, :impactdeathmorbidity, :temp, :climateregional, :regtmp)
 
     connectparameter(m, :impactwaterresources, :population, :population, :population)
     connectparameter(m, :impactwaterresources, :income, :socioeconomic, :income)

@@ -22,6 +22,9 @@
     d2dc = Parameter(index=[regions])
     d2dr = Parameter(index=[regions])
 
+    morttempeffect_linear = Parameter()
+    morttempeffect_quad = Parameter()
+
     dengue = Parameter(index=[time,regions])
     schisto = Parameter(index=[time,regions])
     malaria = Parameter(index=[time,regions])
@@ -33,6 +36,8 @@
     extratropicalstormsdead = Parameter(index=[time,regions])
     population = Parameter(index=[time,regions])
     diasick = Parameter(index=[time,regions])
+
+    temp = Parameter(index=[time, regions])
 end
 
 function timestep(s::impactdeathmorbidity, t::Int)
@@ -40,11 +45,19 @@ function timestep(s::impactdeathmorbidity, t::Int)
     p = s.Parameters
     d = s.Dimensions
 
+    # Population in millions
+    # Dead is in individuals
+
     if t>1
         for r in d.regions
-            v.dead[t, r] = p.dengue[t, r] + p.schisto[t, r] + p.malaria[t, r] + p.cardheat[t, r] + p.cardcold[t, r] + p.resp[t, r] + p.diadead[t, r] + p.hurrdead[t, r] + p.extratropicalstormsdead[t, r]
-            if v.dead[t, r] > p.population[t, r] * 1000000.0
-                v.dead[t, r] = p.population[t, r] / 1000000.0
+            if r == "USA"
+                v.dead[t, r] = p.morttempeffect_linear * temp[t, r] + p.morttempeffect_quad * temp[t, r]^2
+            else
+                v.dead[t, r] = p.dengue[t, r] + p.schisto[t, r] + p.malaria[t, r] + p.cardheat[t, r] + p.cardcold[t, r] + p.resp[t, r] + p.diadead[t, r] + p.hurrdead[t, r] + p.extratropicalstormsdead[t, r]
+            end
+
+            if v.dead[t, r] > 100000.0 #p.population[t, r] * 1000000.0
+                v.dead[t, r] = 100000.0 # p.population[t, r] / 1000000.0
             end
 
             v.yll[t, r] = p.d2ld[r] * p.dengue[t, r] + p.d2ls[r] * p.schisto[t, r] + p.d2lm[r] * p.malaria[t, r] + p.d2lc[r] * p.cardheat[t, r] + p.d2lc[r] * p.cardcold[t, r] + p.d2lr[r] * p.resp[t, r]
