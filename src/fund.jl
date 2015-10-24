@@ -183,6 +183,8 @@ function constructfund(;nsteps=1050)
     connectparameter(m, :impactdeathmorbidity, :extratropicalstormsdead, :impactextratropicalstorms, :extratropicalstormsdead)
     connectparameter(m, :impactdeathmorbidity, :diasick, :impactdiarrhoea, :diasick)
     connectparameter(m, :impactdeathmorbidity, :temp, :climateregional, :regtmp)
+    setparameter(m, :impactdeathmorbidity, :dead_other, zeros(nsteps+1, 16)) # This is a connection point for other impact components
+    setparameter(m, :impactdeathmorbidity, :sick_other, zeros(nsteps+1, 16)) # This is a connection point for other impact components
 
     connectparameter(m, :impactwaterresources, :population, :population, :population)
     connectparameter(m, :impactwaterresources, :income, :socioeconomic, :income)
@@ -209,6 +211,8 @@ function constructfund(;nsteps=1050)
     connectparameter(m, :impactaggregation, :morbcost, :impactdeathmorbidity, :morbcost)
     connectparameter(m, :impactaggregation, :wetcost, :impactsealevelrise, :wetcost)
     connectparameter(m, :impactaggregation, :leavecost, :impactsealevelrise, :leavecost)
+    setparameter(m, :impactaggregation, :eloss_other, zeros(nsteps+1, 16)) # This is a connection point for other impact components
+    setparameter(m, :impactaggregation, :sloss_other, zeros(nsteps+1, 16)) # This is a connection point for other impact components
 
     return m
 end

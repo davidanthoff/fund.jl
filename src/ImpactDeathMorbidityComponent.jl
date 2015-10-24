@@ -37,6 +37,11 @@
     population = Parameter(index=[time,regions])
     diasick = Parameter(index=[time,regions])
 
+    # Other sources of death
+    dead_other = Parameter(index=[time,regions])
+    # Other sources of sickness
+    sick_other = Parameter(index=[time,regions])
+
     temp = Parameter(index=[time, regions])
 end
 
@@ -51,18 +56,18 @@ function timestep(s::impactdeathmorbidity, t::Int)
     if t>1
         for r in d.regions
             if r == "USA"
-                v.dead[t, r] = p.morttempeffect_linear * temp[t, r] + p.morttempeffect_quad * temp[t, r]^2
+                v.dead[t, r] = (p.morttempeffect_linear * temp[t, r] + p.morttempeffect_quad * temp[t, r]^2) * p.population[t, r] * 1e6 / 100000.
             else
-                v.dead[t, r] = p.dengue[t, r] + p.schisto[t, r] + p.malaria[t, r] + p.cardheat[t, r] + p.cardcold[t, r] + p.resp[t, r] + p.diadead[t, r] + p.hurrdead[t, r] + p.extratropicalstormsdead[t, r]
+                v.dead[t, r] = p.dengue[t, r] + p.schisto[t, r] + p.malaria[t, r] + p.cardheat[t, r] + p.cardcold[t, r] + p.resp[t, r] + p.diadead[t, r] + p.hurrdead[t, r] + p.extratropicalstormsdead[t, r] + p.dead_other[t,r]
             end
 
-            if v.dead[t, r] > 100000.0 #p.population[t, r] * 1000000.0
-                v.dead[t, r] = 100000.0 # p.population[t, r] / 1000000.0
+            if v.dead[t, r] > p.population[t, r] * 1e6
+                v.dead[t, r] = p.population[t, r] * 1e6
             end
 
             v.yll[t, r] = p.d2ld[r] * p.dengue[t, r] + p.d2ls[r] * p.schisto[t, r] + p.d2lm[r] * p.malaria[t, r] + p.d2lc[r] * p.cardheat[t, r] + p.d2lc[r] * p.cardcold[t, r] + p.d2lr[r] * p.resp[t, r]
 
-            v.yld[t, r] = p.d2dd[r] * p.dengue[t, r] + p.d2ds[r] * p.schisto[t, r] + p.d2dm[r] * p.malaria[t, r] + p.d2dc[r] * p.cardheat[t, r] + p.d2dc[r] * p.cardcold[t, r] + p.d2dr[r] * p.resp[t, r] + p.diasick[t, r]
+            v.yld[t, r] = p.d2dd[r] * p.dengue[t, r] + p.d2ds[r] * p.schisto[t, r] + p.d2dm[r] * p.malaria[t, r] + p.d2dc[r] * p.cardheat[t, r] + p.d2dc[r] * p.cardcold[t, r] + p.d2dr[r] * p.resp[t, r] + p.diasick[t, r] + p.sick_other[t,r]
 
             v.deadcost[t, r] = p.vsl[t, r] * v.dead[t, r] / 1000000000.0
             # deadcost:= vyll*ypc*yll/1000000000
