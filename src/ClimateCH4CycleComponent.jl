@@ -30,7 +30,7 @@ function run_timestep(s::climatech4cycle, t::Int)
         v.acch4[t] = v.acch4[t - 1] + 0.3597 * p.globch4[t] - v.ch4decay * (v.acch4[t - 1] - p.ch4pre)
 
         if v.acch4[t] < 0
-            error("ch4 atmospheric concentration out of range in $t")
+            error("ch4 atmospheric concentration, '$(v.acch4[t])', unexpectedly less than zero at timestep $t")
         end
     end
 end
